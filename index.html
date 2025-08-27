@@ -1,0 +1,148 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Westline Contractors - Professional Contracting Services</title>
+    <meta name="description" content="Westline Contractors provides expert construction, electrical, and renovation services across Australia. Contact us at westlinecontractors.com.au!">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="#home">
+                <img src="https://via.placeholder.com/150x50?text=Westline+Logo" alt="Westline Contractors Logo" class="h-10 md:h-12">
+            </a>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#home" class="hover:text-gray-300">Home</a></li>
+                    <li><a href="#about" class="hover:text-gray-300">About</a></li>
+                    <li><a href="#services" class="hover:text-gray-300">Services</a></li>
+                    <li><a href="#contact" class="hover:text-gray-300">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-blue-600 text-white py-20 text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-4">Welcome to Westline Contractors</h2>
+            <p class="text-lg mb-6">Delivering reliable construction and contracting solutions for Australian homes and businesses.</p>
+            <a href="#contact" class="bg-white text-blue-800 px-6 py-3 rounded-full font-semibold hover:bg-gray-200">Get a Quote</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">About Us</h2>
+            <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto">
+                Westline Contractors is a 100% Australian-owned company specializing in high-quality construction, electrical, and renovation services. 
+                With a commitment to excellence, we deliver projects on time and within budget. ABN: 98 765 432 109
+            </p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="bg-gray-200 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">General Construction</h3>
+                    <p class="text-gray-600">Residential and commercial building projects with expert craftsmanship.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Electrical Services</h3>
+                    <p class="text-gray-600">Safe and reliable wiring, installations, and maintenance.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Renovations & Fitouts</h3>
+                    <p class="text-gray-600">Transform your space with custom renovations and professional fitouts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <p class="text-lg text-gray-700 mb-4">Contact our Australian team for expert contracting solutions.</p>
+                    <p class="text-gray-700"><strong>Phone:</strong> +61 8 1234 5678</p>
+                    <p class="text-gray-700"><strong>Toll-Free:</strong> 1800 987 654</p>
+                    <p class="text-gray-700"><strong>Email:</strong> info@westlinecontractors.com.au</p>
+                    <p class="text-gray-700"><strong>Address:</strong> PO Box 5678, Perth, WA 6000, Australia</p>
+                </div>
+                <form action="https://formspree.io/f/your-form-id" method="POST" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-gray-700">Name</label>
+                        <input type="text" id="name" name="name" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-700">Email</label>
+                        <input type="email" id="email" name="email" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-gray-700">Message</label>
+                        <textarea id="message" name="message" class="w-full p-2 border rounded" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-700">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Westline Contractors. All rights reserved.</p>
+            <p>ABN: 98 765 432 109</p>
+            <p><a href="mailto:info@westlinecontractors.com.au" class="hover:text-gray-300">info@westlinecontractors.com.au</a></p>
+        </div>
+    </footer>
+</body>
+</html>
